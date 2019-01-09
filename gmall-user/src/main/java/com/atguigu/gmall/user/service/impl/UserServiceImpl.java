@@ -1,8 +1,10 @@
 package com.atguigu.gmall.user.service.impl;
 
-import com.atguigu.gmall.user.bean.UserInfo;
+
+
+import com.atguigu.gmall.bean.UserInfo;
+import com.atguigu.gmall.service.UserService;
 import com.atguigu.gmall.user.mapper.UserMapper;
-import com.atguigu.gmall.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<UserInfo> getAll() {
-        return userMapper.selectAll();
+        List<UserInfo> userInfos =  userMapper.selectAll();
+        return userInfos;
     }
 
     /**

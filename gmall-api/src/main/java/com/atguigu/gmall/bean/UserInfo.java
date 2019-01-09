@@ -1,14 +1,14 @@
-package com.atguigu.gmall.user.bean;
+package com.atguigu.gmall.bean;
 
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.io.Serializable;
+import java.util.List;
 
-public class UserInfo {
+public class UserInfo implements Serializable {
+
     @Id
     @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     @Column
     private String loginName;
@@ -27,18 +27,14 @@ public class UserInfo {
     @Column
     private String userLevel;
 
-    public UserInfo() {
+    private List<UserAddress> userAddressList;
+
+    public List<UserAddress> getUserAddressList() {
+        return userAddressList;
     }
 
-    public UserInfo(String loginName, String nickName, String passwd, String name, String phoneNum, String email, String headImg, String userLevel) {
-        this.loginName = loginName;
-        this.nickName = nickName;
-        this.passwd = passwd;
-        this.name = name;
-        this.phoneNum = phoneNum;
-        this.email = email;
-        this.headImg = headImg;
-        this.userLevel = userLevel;
+    public void setUserAddressList(List<UserAddress> userAddressList) {
+        this.userAddressList = userAddressList;
     }
 
     public String getId() {
