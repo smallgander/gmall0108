@@ -5,57 +5,170 @@
     <title>Title</title>
 </head>
 <body>
-    <table id="dg" class="easyui-datagrid" title="属性列表"
-           data-options="singleSelect:true ,method:'get',toolbar:'#tb'">
-        <thead>
-        <tr>
-            <th data-options="field:'id'" width="20%">属性id </th>
-            <th data-options="field:'attrName'" width="80%">属性名</th>
-        </tr>
-        </thead>
-            <div id="tb" style="padding:5px;height:auto">
-                <div style="margin-bottom:5px">
-                    <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加</a>
-                    <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true">编辑</a>
-                    <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除</a>
-                </div>
-                <div>
-                    一级分类：
-                    <select data-options="
+<table id="dg" class="easyui-datagrid" title="属性列表"
+       data-options="singleSelect:true ,method:'get',toolbar:'#tb'">
+    <thead>
+    <tr>
+        <th data-options="field:'id'" width="20%">属性id</th>
+        <th data-options="field:'attrName'" width="80%">属性名</th>
+    </tr>
+    </thead>
+    <div id="tb" style="padding:5px;height:auto">
+        <div style="margin-bottom:5px">
+            <a href="javascript:addAttrInfo();" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true">编辑</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除</a>
+        </div>
+        <div>
+            一级分类：
+            <select data-options="
                         valueField: 'id',
                         textField: 'name',
                         url: '/getCatalog1',
                         onSelect: function(rec){
                             $('#ctg2ForAttrList').combobox('clear');
                             $('#ctg2ForAttrList').combobox('reload','getCatalog2?catalog1Id='+rec.id);
-                        }" id="ctg1ForAttrList"  class="easyui-combobox" style="width:100px" ></select>
-                    二级分类：
-                    <select name="ctg2ForAttrList" data-options="
+                            $('#ctg3ForAttrList').combobox('clear');
+                            $('#ctg3ForAttrList').combobox('reload','getCatalog3?catalog2Id='+rec.id);
+                        }" id="ctg1ForAttrList" class="easyui-combobox" style="width:100px"></select>
+            二级分类：
+            <select name="ctg2ForAttrList" data-options="
                         valueField: 'id',
                         textField: 'name',
                         url: '/getCatalog2',
                         onSelect: function(rec){
                             $('#ctg3ForAttrList').combobox('clear');
                             $('#ctg3ForAttrList').combobox('reload','getCatalog3?catalog2Id='+rec.id);
-                        }" id="ctg2ForAttrList"  class="easyui-combobox"  style="width:100px" ></select>
-                    三级分类：
-                    <select name="ctg3ForAttrList" data-options="
+                        }" id="ctg2ForAttrList" class="easyui-combobox" style="width:100px"></select>
+            三级分类：
+            <select name="ctg3ForAttrList" data-options="
                         valueField: 'id',
                         textField: 'name',
                         url: '/getCatalog3'
-                        " id="ctg3ForAttrList"  class="easyui-combobox"   style="width:100px" ></select>
-                    <a href="javascript:reloadAttrList();" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加</a>
-                </div>
+                        " id="ctg3ForAttrList" class="easyui-combobox" style="width:100px"></select>
+            <a href="javascript:reloadAttrList();" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加</a>
+        </div>
+    </div>
+</table>
+<!--点击添加按钮后，会出现此对话框-->
+<div id="dlg" title="添加平台属性" style="width:600px;height:500px;padding:5px;" class="easyui-dialog"
+     data-options="buttons:'#dd',iconCls:'icon-save',closed:true">
+    <br>
+    属性名称：<input id="attrName"  class="easyui-textbox" data-options="iconCls:'icon-search'"
+                style="width:140px"/>
+    <br>
+    <br>
+    <table id="dg_av" class="easyui-datagrid" title="属性值列表"></table>
+</div>
 
-            </div>
-    </table>
+<!--在添加对话框中添加，保存，删除按钮-->
+<div id="dd">
+    <a href="javascript:saveAttr();" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>
+    <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除</a>
+</div>
 <script type="text/javascript">
-    function reloadAttrList(){
-        var ctg3val = $("#ctg3ForAttrList").combobox('getValue');
-        $("#dg").datagrid({
-            url:'/getAttrList?cataLog3Id='+ctg3val
+
+    function saveAttr(){
+
+        var attrJSON ={};
+
+        //得么文件本框中的值
+        var attrName = $("#attrName").textbox("getValue");
+        attrJSON["attrName"]=attrName;
+        var rows = $("#dg_av").datagrid("getRows");
+
+
+        $(rows).each(function(i,row){
+            attrJSON["attrValueList["+i+"].valueName"] = row.valueName;
+        });
+        $.post("saveAttr",attrJSON,function(data){
+            //显示操作结果
+            alert(data);
+            //关闭添加属性的对话框
+            $("#dlg").dialog("close");
+            $('#ctg1ForAttrList').combobox('clear');
+            $('#ctg2ForAttrList').combobox('clear');
+            $('#ctg3ForAttrList').combobox('clear');
+            //将库中的信息进行回显
+            $("#dg").datagrid({
+                url: '/getAttrList?cataLog3Id=' + ctg3val
+            });
         });
     }
+
+    //给添加按钮绑定单击事件
+    function addAttrInfo() {
+        if(!checkBeforeDialog()){
+            return ;
+        }
+        $("#dlg").dialog("open");
+        //在dg_av中动态的添加两列
+        $("#dg_av").datagrid({
+            toolbar: [{
+                text: '添加',
+                iconCls: 'icon-add',
+                handler: function () {
+                    //追加一个新的数据表格的行
+                    $("#dg_av").datagrid('appendRow', {
+                        id: '',
+                        valueName: '请添加属性值'
+                    });
+                }
+            }, '-', {
+                text: '删除',
+                iconCls: 'icon-remove',
+                handler: function () {
+                    //得到当前被选中的行
+                    var row = $("#dg_av").datagrid('getSelected');
+                    //得到行索引
+                    var row_index = $("#dg_av").datagrid('getRowIndex', row);
+                    //根据选的当前的进行删除
+                    $("#dg_av").datagrid('deleteRow', row_index);
+                }
+            }]
+            ,
+            columns: [[
+                {field: 'id', title: '编号', width: '20%', sortable: true},
+                {field: 'valueName', title: '属性名称', width: '80%', sortable: true,
+                    editor: {
+                        type: 'validatebox', options: { required: true}  //必填项
+                    }
+                }
+            ]],
+            //双击当前行，得到当前行索引
+            onDblClickRow: function (rowIndex, rowData) {
+                //进入当前行，让当前行进入编编操作
+                //双击开启编辑行
+                $("#dg_av").datagrid("beginEdit", rowIndex);
+                //设定当失去焦点时,退出编辑状态
+                var valueName = rowData.valueName;
+                $("input.datagrid-editable-input").val(valueName).bind("blur",function(evt){
+                    $("#dg_av").datagrid('endEdit',rowIndex);
+                });
+            }
+        });
+    }
+    function reloadAttrList() {
+        var ctg3val = $("#ctg3ForAttrList").combobox('getValue');
+        $("#dg").datagrid({
+            url: '/getAttrList?cataLog3Id=' + ctg3val
+        });
+    }
+
+    /**
+     * 三级分类id的数据校验
+     * 以上有添加操作，发展在完成三级id出现的情况下才可以进行，否则，容易造成库中的数据混乱
+     */
+    function checkBeforeDialog(){
+        var ctg3val = $("#ctg3ForAttrList").combobox('getValue');
+        if(ctg3val==''){
+            $.messager.alert('警告','请先选择三级分类','warning');
+            return false;
+        }
+        return true;
+    }
+
+
 </script>
 </body>
 </html>

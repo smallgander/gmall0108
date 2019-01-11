@@ -31,7 +31,7 @@ public class AttrManageController {
     @ResponseBody
     public List<BaseCatalog2> getCatalog2(String catalog1Id){
         List<BaseCatalog2> baseCatalog2s = attrService.getCatalog2(catalog1Id);
-        System.out.println(baseCatalog2s);
+       // System.out.println(baseCatalog2s);
         return baseCatalog2s;
     }
     @RequestMapping("getCatalog3")
@@ -48,6 +48,18 @@ public class AttrManageController {
     public List<BaseAttrInfo> getAttrList(String cataLog3Id){
         List<BaseAttrInfo> attrInfoList = attrService.getAttrInfo(cataLog3Id);
         return attrInfoList;
+    }
+
+    /**
+     * 向数据库表中保存属性信息
+     * @param baseAttrInfo
+     * @return
+     */
+    @RequestMapping("saveAttr")
+    @ResponseBody
+    public String saveAttr(BaseAttrInfo baseAttrInfo){
+        attrService.saveAttr(baseAttrInfo);
+        return "success";
     }
 
 }

@@ -1,10 +1,7 @@
 package com.atguigu.gmall.manage.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.atguigu.gmall.bean.BaseAttrInfo;
-import com.atguigu.gmall.bean.BaseCatalog1;
-import com.atguigu.gmall.bean.BaseCatalog2;
-import com.atguigu.gmall.bean.BaseCatalog3;
+import com.atguigu.gmall.bean.*;
 import com.atguigu.gmall.manage.mapper.*;
 import com.atguigu.gmall.service.AttrService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,5 +64,25 @@ public class AttrServiceImpl implements AttrService {
         BaseAttrInfo baseAttrInfo = new BaseAttrInfo();
         baseAttrInfo.setCatalog3Id(cataLog3Id);
         return baseAttrInfoMapper.select(baseAttrInfo);
+    }
+
+    /**
+     * 向数据库表中保存属性信息
+     * @param baseAttrInfo
+     */
+    @Override
+    public void saveAttr(BaseAttrInfo baseAttrInfo) {
+        //向属性表中的添加属性信息
+        baseAttrInfoMapper.insertSelective(baseAttrInfo);
+        //得到新生成的主键id
+        String attrId = baseAttrInfo.getId();
+        //得到属性对应的属性值信息
+        List<BaseAttrValue> attrValueList = baseAttrInfo.getAttrValueList();
+        for( BaseAttrValue  baseAttrValue :attrValueList){
+            baseAttrValue.setAttrId(attrId);
+            baseAttrValueMapper.insertSelective(baseAttrValue);
+        }
+
+
     }
 }
