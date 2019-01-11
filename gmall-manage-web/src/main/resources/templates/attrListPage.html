@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <table id="dg" class="easyui-datagrid" title="属性列表"
+           data-options="singleSelect:true ,method:'get',toolbar:'#tb'">
+        <thead>
+        <tr>
+            <th data-options="field:'id'" width="20%">属性id </th>
+            <th data-options="field:'attrName'" width="80%">属性名</th>
+        </tr>
+        </thead>
+            <div id="tb" style="padding:5px;height:auto">
+                <div style="margin-bottom:5px">
+                    <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加</a>
+                    <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true">编辑</a>
+                    <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除</a>
+                </div>
+                <div>
+                    一级分类：
+                    <select data-options="
+                        valueField: 'id',
+                        textField: 'name',
+                        url: '/getCatalog1',
+                        onSelect: function(rec){
+                            $('#ctg2ForAttrList').combobox('clear');
+                            $('#ctg2ForAttrList').combobox('reload','getCatalog2?catalog1Id='+rec.id);
+                        }" id="ctg1ForAttrList"  class="easyui-combobox" style="width:100px" ></select>
+                    二级分类：
+                    <select name="ctg2ForAttrList" data-options="
+                        valueField: 'id',
+                        textField: 'name',
+                        url: '/getCatalog2',
+                        onSelect: function(rec){
+                            $('#ctg3ForAttrList').combobox('clear');
+                            $('#ctg3ForAttrList').combobox('reload','getCatalog3?catalog2Id='+rec.id);
+                        }" id="ctg2ForAttrList"  class="easyui-combobox"  style="width:100px" ></select>
+                    三级分类：
+                    <select name="ctg3ForAttrList" data-options="
+                        valueField: 'id',
+                        textField: 'name',
+                        url: '/getCatalog3'
+                        " id="ctg3ForAttrList"  class="easyui-combobox"   style="width:100px" ></select>
+                    <a href="javascript:reloadAttrList();" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加</a>
+                </div>
+
+            </div>
+    </table>
+<script type="text/javascript">
+    function reloadAttrList(){
+        var ctg3val = $("#ctg3ForAttrList").combobox('getValue');
+        $("#dg").datagrid({
+            url:'/getAttrList?cataLog3Id='+ctg3val
+        });
+    }
+</script>
+</body>
+</html>
